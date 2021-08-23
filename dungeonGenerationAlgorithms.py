@@ -16,7 +16,7 @@ each of the algorithm classes to be easily portable into other
 projects. My success in that reguard is up for debate.
 '''
 
-import libtcodpy as libtcod
+import tcod
 import random
 from math import sqrt
 from collections import OrderedDict
@@ -34,11 +34,11 @@ USE_PREFABS = False
 
 class UserInterface:
 	def __init__(self):
-		libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
-		libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'Roguelike Dungeon Comparison', False) #TODO: Change Game Name
-		self.con = libtcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
+		tcod.console_set_custom_font('arial10x10.png', tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
+		tcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'Roguelike Dungeon Comparison', False) #TODO: Change Game Name
+		self.con = tcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
 		
-		self.textBox = libtcod.console_new(SCREEN_WIDTH,TEXTBOX_HEIGHT)
+		self.textBox = tcod.console_new(SCREEN_WIDTH,TEXTBOX_HEIGHT)
 		self.helpText = OrderedDict([
 		("1","Tunneling Algorithm"),
 		("2","BSP Tree Algorithm"),
@@ -58,68 +58,68 @@ class UserInterface:
 
 		global keyboard
 
-		keyboard = libtcod.Key()
+		keyboard = tcod.Key()
 
 		self.map = Map()
 		self.map.generateLevel(MAP_WIDTH,MAP_HEIGHT)
 
 	def mainLoop(self):
 
-		while not libtcod.console_is_window_closed():
+		while not tcod.console_is_window_closed():
 			global keyboard
 
 			#Input
-			keyboard = libtcod.console_check_for_keypress()
+			keyboard = tcod.console_check_for_keypress()
 			exit = self.handleInput(keyboard)
 			if (exit): break
 
 			#Render
 			self.renderAll()
 
-			libtcod.console_flush()
+			tcod.console_flush()
 
 	def handleInput(self,keyboard):
-		if (keyboard.vk	== libtcod.KEY_ESCAPE): 
+		if (keyboard.vk	== tcod.KEY_ESCAPE): 
 			return True #Exit Program	
 
-		if (keyboard.vk == libtcod.KEY_SPACE):
+		if (keyboard.vk == tcod.KEY_SPACE):
 			# Generate a level based on the last generator used
 			self.map.level = self.map._previousGenerator.generateLevel(MAP_WIDTH,MAP_HEIGHT)
 
-		if (keyboard.vk == libtcod.KEY_0):
+		if (keyboard.vk == tcod.KEY_0):
 			# cycle through color schemes
 			self._colorScheme = (self._colorScheme+1) % len(ColorScheme._scheme)
 			self.setColorScheme(self._colorScheme)
 
-		if (keyboard.vk == libtcod.KEY_1):
+		if (keyboard.vk == tcod.KEY_1):
 			# generate map with tunneling algorithm
 			self.map.useTunnelingAlgorithm()
 
-		if (keyboard.vk == libtcod.KEY_2):
+		if (keyboard.vk == tcod.KEY_2):
 			# generate map with bsp tree
 			self.map.useBSPTree()
 
-		if (keyboard.vk == libtcod.KEY_3):
+		if (keyboard.vk == tcod.KEY_3):
 			# generate map with drunkard's walk algorithm
 			self.map.useDrunkardsWalk()
 
-		if (keyboard.vk == libtcod.KEY_4):
+		if (keyboard.vk == tcod.KEY_4):
 			# generate map with cellular automata
 			self.map.useCellularAutomata()
 
-		if (keyboard.vk == libtcod.KEY_5):
+		if (keyboard.vk == tcod.KEY_5):
 			# generate map with room adition
 			self.map.useRoomAddition()
 
-		if (keyboard.vk == libtcod.KEY_6):
+		if (keyboard.vk == tcod.KEY_6):
 			# generate map with cellular automata
 			self.map.useCityWalls()
 
-		if (keyboard.vk == libtcod.KEY_7):
+		if (keyboard.vk == tcod.KEY_7):
 			# generate map with maze with rooms algorithm
 			self.map.useMazeWithRooms()
 
-		if (keyboard.vk == libtcod.KEY_8):
+		if (keyboard.vk == tcod.KEY_8):
 			# generate map with messy bsp tree
 			self.map.useMessyBSPTree()
 
@@ -128,26 +128,26 @@ class UserInterface:
 		for y in range(MAP_HEIGHT):
 			for x in range(MAP_WIDTH):
 				if self.map.level[x][y] == 1:
-					libtcod.console_put_char_ex(self.con, x, y, '#', self.color_light_wall_fore, self.color_light_wall_back)
+					tcod.console_put_char_ex(self.con, x, y, '#', self.color_light_wall_fore, self.color_light_wall_back)
 				else:
-					libtcod.console_put_char_ex(self.con, x, y, '.', self.color_light_ground_fore, self.color_light_ground_back)
+					tcod.console_put_char_ex(self.con, x, y, '.', self.color_light_ground_fore, self.color_light_ground_back)
 	
 		#TODO: Print Instructions to Screen
 		self.renderTextBox()
 		# ==== Blit Console to Screen ====
-		libtcod.console_blit(self.con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
+		tcod.console_blit(self.con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
 
 	def renderTextBox(self):
-		libtcod.console_set_default_background(self.textBox, libtcod.black)
-		libtcod.console_set_default_foreground(self.textBox, libtcod.white)
-		libtcod.console_clear(self.textBox)
+		tcod.console_set_default_background(self.textBox, tcod.black)
+		tcod.console_set_default_foreground(self.textBox, tcod.white)
+		tcod.console_clear(self.textBox)
 
 		keys = self.helpText.keys()
 		x = 2
 		y = 1
 		for key in keys:
 
-			libtcod.console_print_ex(self.textBox,x,y,libtcod.BKGND_NONE, libtcod.LEFT,
+			tcod.console_print_ex(self.textBox,x,y,tcod.BKGND_NONE, tcod.LEFT,
 				key + ") " + self.helpText[key])
 			
 
@@ -157,7 +157,7 @@ class UserInterface:
 				x += 26
 				y = 1
 
-		libtcod.console_blit(self.textBox,0,0,SCREEN_WIDTH,TEXTBOX_HEIGHT,0,0,SCREEN_HEIGHT - TEXTBOX_HEIGHT)
+		tcod.console_blit(self.textBox,0,0,SCREEN_WIDTH,TEXTBOX_HEIGHT,0,0,SCREEN_HEIGHT - TEXTBOX_HEIGHT)
 
 	def setColorScheme(self, colorScheme):
 		self.color_light_wall_fore = ColorScheme._scheme[colorScheme][0]
@@ -170,34 +170,34 @@ class ColorScheme():
 
 	#DEFAULT
 	BLUE = [
-	libtcod.Color(100, 100, 100),	# color_light_wall_fore
-	libtcod.Color(50, 50, 150),	# color_light_wall_back
-	libtcod.gray, 				# color_light_ground_fore
-	libtcod.Color(10, 10, 10) 	# color_light_ground_back
+	tcod.Color(100, 100, 100),	# color_light_wall_fore
+	tcod.Color(50, 50, 150),	# color_light_wall_back
+	tcod.gray, 				# color_light_ground_fore
+	tcod.Color(10, 10, 10) 	# color_light_ground_back
 	]
 	_scheme.append(BLUE)
 
 	MAUVE = [
-	libtcod.Color(50, 50, 50),	# color_light_wall_fore
-	libtcod.Color(204, 153, 255),	# color_light_wall_back
-	libtcod.gray, 				# color_light_ground_fore
-	libtcod.Color(10, 10, 10) 	# color_light_ground_back
+	tcod.Color(50, 50, 50),	# color_light_wall_fore
+	tcod.Color(204, 153, 255),	# color_light_wall_back
+	tcod.gray, 				# color_light_ground_fore
+	tcod.Color(10, 10, 10) 	# color_light_ground_back
 	]
 	_scheme.append(MAUVE)
 
 	GRAYSCALE = [
-	libtcod.black, 				# color_light_wall_fore
-	libtcod.gray,			# color_light_wall_back
-	libtcod.white, 				# color_light_ground_fore
-	libtcod.black 				# color_light_ground_back
+	tcod.black, 				# color_light_wall_fore
+	tcod.gray,			# color_light_wall_back
+	tcod.white, 				# color_light_ground_fore
+	tcod.black 				# color_light_ground_back
 	]
 	_scheme.append(GRAYSCALE)
 
 	TEXTONLY = [
-	libtcod.white, 				# color_light_wall_fore
-	libtcod.black,			# color_light_wall_back
-	libtcod.white, 				# color_light_ground_fore
-	libtcod.black 				# color_light_ground_back
+	tcod.white, 				# color_light_wall_fore
+	tcod.black,			# color_light_wall_back
+	tcod.white, 				# color_light_ground_fore
+	tcod.black 				# color_light_ground_back
 	]
 	_scheme.append(TEXTONLY)
 
@@ -436,7 +436,7 @@ class DrunkardsWalk:
 		self.drunkardY = random.randint(2,mapHeight-2)
 		self.filledGoal = mapWidth*mapHeight*self._percentGoal
 
-		for i in xrange(self.walkIterations):
+		for i in range(self.walkIterations):
 			self.walk(mapWidth, mapHeight)
 			if (self._filled >= self.filledGoal):
 				break
@@ -556,7 +556,7 @@ class CellularAutomata:
 
 	def createCaves(self,mapWidth,mapHeight):
 		# ==== Create distinct caves ====
-		for i in xrange (0,self.iterations):
+		for i in range (0,self.iterations):
 			# Pick a random point with a buffer around the edges of the map
 			tileX = random.randint(1,mapWidth-2) #(2,mapWidth-3)
 			tileY = random.randint(1,mapHeight-2) #(2,mapHeight-3)
@@ -573,7 +573,7 @@ class CellularAutomata:
 
 	def cleanUpMap(self,mapWidth,mapHeight):
 		if (self.smoothEdges):
-			for i in xrange (0,5):
+			for i in range (0,5):
 				# Look at each cell individually and check for smoothness
 				for x in range(1,mapWidth-1):
 					for y in range (1,mapHeight-1):
@@ -720,14 +720,14 @@ class CellularAutomata:
 		for currentCave in self.caves:
 			for point1 in currentCave: break # get an element from cave1
 			point2 = None
-			distance = None
+			distance = 0
 			for nextCave in self.caves:
 				if nextCave != currentCave and not self.checkConnectivity(currentCave,nextCave):
 					# choose a random point from nextCave
 					for nextPoint in nextCave: break # get an element from cave1
 					# compare distance of point1 to old and new point2
 					newDistance = self.distanceFormula(point1,nextPoint)
-					if (newDistance < distance) or distance == None:
+					if (newDistance < distance) or distance == 0:
 						point2 = nextPoint
 						distance = newDistance
 
@@ -869,28 +869,28 @@ class RoomAddition:
 		return room
 
 	def generateRoomCross(self):
-		roomHorWidth = (random.randint(self.CROSS_ROOM_MIN_SIZE+2,self.CROSS_ROOM_MAX_SIZE))/2*2
+		roomHorWidth = int((random.randint(self.CROSS_ROOM_MIN_SIZE+2,self.CROSS_ROOM_MAX_SIZE))/2*2)
 
-		roomVirHeight = (random.randint(self.CROSS_ROOM_MIN_SIZE+2,self.CROSS_ROOM_MAX_SIZE))/2*2
+		roomVirHeight = int((random.randint(self.CROSS_ROOM_MIN_SIZE+2,self.CROSS_ROOM_MAX_SIZE))/2*2)
 
-		roomHorHeight = (random.randint(self.CROSS_ROOM_MIN_SIZE,roomVirHeight-2))/2*2
+		roomHorHeight = int((random.randint(self.CROSS_ROOM_MIN_SIZE,roomVirHeight-2))/2*2)
 
-		roomVirWidth = (random.randint(self.CROSS_ROOM_MIN_SIZE,roomHorWidth-2))/2*2
+		roomVirWidth = int((random.randint(self.CROSS_ROOM_MIN_SIZE,roomHorWidth-2))/2*2)
 
 		room = [[1
-			for y in xrange(roomVirHeight)]
-				for x in xrange(roomHorWidth)]
+			for y in range(roomVirHeight)]
+				for x in range(roomHorWidth)]
 
 		# Fill in horizontal space
-		virOffset = roomVirHeight/2 - roomHorHeight/2
-		for y in xrange(virOffset,roomHorHeight+virOffset):
-			for x in xrange(0,roomHorWidth):
+		virOffset = int(roomVirHeight/2 - roomHorHeight/2)
+		for y in range(virOffset,roomHorHeight+virOffset):
+			for x in range(0,roomHorWidth):
 				room[x][y] = 0
 
 		# Fill in virtical space
-		horOffset = roomHorWidth/2 - roomVirWidth/2
-		for y in xrange(0,roomVirHeight):
-			for x in xrange(horOffset,roomVirWidth+horOffset):
+		horOffset = int(roomHorWidth/2 - roomVirWidth/2)
+		for y in range(0,roomVirHeight):
+			for x in range(horOffset,roomVirWidth+horOffset):
 				room[x][y] = 0
 
 		return room
@@ -1031,7 +1031,7 @@ class RoomAddition:
 		roomWidth, roomHeight = self.getRoomDimensions(room)
 
 		# try n times to find a wall that lets you build room in that direction
-		for i in xrange(self.placeRoomAttempts):
+		for i in range(self.placeRoomAttempts):
 			# try to place the room against the tile, else connected by a tunnel of length i
 
 			wallTile = None
@@ -1066,7 +1066,7 @@ class RoomAddition:
 					startRoomY = wallTile[1] - y
 
 			#then slide it until it doesn't touch anything
-			for tunnelLength in xrange(self.maxTunnelLength):
+			for tunnelLength in range(self.maxTunnelLength):
 				possibleRoomX = startRoomX + direction[0]*tunnelLength
 				possibleRoomY = startRoomY + direction[1]*tunnelLength
 
@@ -1095,7 +1095,7 @@ class RoomAddition:
 		for x in range (roomWidth):
 			for y in range (roomHeight):
 				if room[x][y] == 0:
-					self.level[roomX+x][roomY+y] = 0
+					self.level[int(roomX+x)][int(roomY+y)] = 0
 
 		self.rooms.append(room)
 
@@ -1200,10 +1200,10 @@ class RoomAddition:
 		
 		
 		#initialize the libtcodpy map
-		libtcodMap = libtcod.map_new(mapWidth,mapHeight)
+		libtcodMap = tcod.map_new(mapWidth,mapHeight)
 		self.recomputePathMap(mapWidth,mapHeight,libtcodMap)
 
-		for i in xrange(self.shortcutAttempts):
+		for i in range(self.shortcutAttempts):
 			# check i times for places where shortcuts can be made
 			while True:
 				#Pick a random floor tile
@@ -1217,17 +1217,17 @@ class RoomAddition:
 						break
 
 			# look around the tile for other floor tiles
-			for x in xrange(-1,2):
-				for y in xrange(-1,2):
+			for x in range(-1,2):
+				for y in range(-1,2):
 					if x != 0 or y != 0: # Exclude the center tile
 						newX = floorX + (x*self.shortcutLength)
 						newY = floorY + (y*self.shortcutLength)
 						if self.level[newX][newY] == 0:
 						# run pathfinding algorithm between the two points
 							#back to the libtcodpy nonesense
-							pathMap = libtcod.path_new_using_map(libtcodMap)
-							libtcod.path_compute(pathMap,floorX,floorY,newX,newY)
-							distance = libtcod.path_size(pathMap)
+							pathMap = tcod.path_new_using_map(libtcodMap)
+							tcod.path_compute(pathMap,floorX,floorY,newX,newY)
+							distance = tcod.path_size(pathMap)
 
 							if distance > self.minPathfindingDistance:
 								# make shortcut
@@ -1236,25 +1236,25 @@ class RoomAddition:
 
 
 		# destroy the path object
-		libtcod.path_delete(pathMap)
+		tcod.path_delete(pathMap)
 
 	def recomputePathMap(self,mapWidth,mapHeight,libtcodMap):
-		for x in xrange(mapWidth):
-			for y in xrange(mapHeight):
+		for x in range(mapWidth):
+			for y in range(mapHeight):
 				if self.level[x][y] == 1:
-					libtcod.map_set_properties(libtcodMap,x,y,False,False)
+					tcod.map_set_properties(libtcodMap,x,y,False,False)
 				else:
-					libtcod.map_set_properties(libtcodMap,x,y,True,True)
+					tcod.map_set_properties(libtcodMap,x,y,True,True)
 
 	def carveShortcut(self,x1,y1,x2,y2):
 		if x1-x2 == 0:
 			# Carve virtical tunnel
-			for y in xrange(min(y1,y2),max(y1,y2)+1):
+			for y in range(min(y1,y2),max(y1,y2)+1):
 				self.level[x1][y] = 0
 
 		elif y1-y2 == 0:
 			# Carve Horizontal tunnel
-			for x in xrange(min(x1,x2),max(x1,x2)+1):
+			for x in range(min(x1,x2),max(x1,x2)+1):
 				self.level[x][y1] = 0
 
 		elif (y1-y2)/(x1-x2) == 1:
@@ -1489,8 +1489,8 @@ class MazeWithRooms:
 			'''
 			roomWidth = random.randint(int(self.ROOM_MIN_SIZE/2),int(self.ROOM_MAX_SIZE/2))*2+1
 			roomHeight = random.randint(int(self.ROOM_MIN_SIZE/2),int(self.ROOM_MAX_SIZE/2))*2+1
-			x = (random.randint(0,mapWidth-roomWidth-1)/2)*2+1
-			y = (random.randint(0,mapHeight-roomHeight-1)/2)*2+1
+			x = int((random.randint(0,mapWidth-roomWidth-1)/2)*2+1)
+			y = int((random.randint(0,mapHeight-roomHeight-1)/2)*2+1)
 
 			room = Rect(x,y,roomWidth,roomHeight)
 			# check for overlap with previous rooms
@@ -1514,11 +1514,11 @@ class MazeWithRooms:
 		west = (-1,0)
 
 		connectorRegions = [[ None
-			for y in xrange(mapHeight)]
-				for x in xrange(mapWidth)]
+			for y in range(mapHeight)]
+				for x in range(mapWidth)]
 
-		for x in xrange(1,mapWidth-1):
-			for y in xrange(1,mapHeight-1):
+		for x in range(1,mapWidth-1):
+			for y in range(1,mapHeight-1):
 				if self.level[x][y] != 1: continue
 
 				# count the number of different regions the wall tile is touching
@@ -1537,8 +1537,8 @@ class MazeWithRooms:
 
 		# make a list of all of the connectors
 		connectors = set()
-		for x in xrange(0,mapWidth):
-			for y in xrange(0,mapHeight):
+		for x in range(0,mapWidth):
+			for y in range(0,mapHeight):
 				if connectorRegions[x][y]:
 					connectorPosition = (x,y)
 					connectors.add(connectorPosition)
@@ -1546,7 +1546,7 @@ class MazeWithRooms:
 		# keep track of the regions that have been merged.
 		merged = {}
 		openRegions = set()
-		for i in xrange(self._currentRegion+1):
+		for i in range(self._currentRegion+1):
 			merged[i] = i
 			openRegions.add(i)
 
@@ -1579,7 +1579,7 @@ class MazeWithRooms:
 			previously been merged with the ones we are
 			connecting now.
 			'''
-			for i in xrange(self._currentRegion+1):
+			for i in range(self._currentRegion+1):
 				if merged[i] in sources:
 					merged[i] = dest
 
@@ -1634,8 +1634,8 @@ class MazeWithRooms:
 		while not done:
 			done = True
 
-			for y in xrange(1,mapHeight):
-				for x in xrange(1,mapWidth):
+			for y in range(1,mapHeight):
+				for x in range(1,mapWidth):
 					if self.level[x][y] == 0:
 						
 						exits = 0
@@ -1791,10 +1791,10 @@ class MessyBSPTree:
 
 	def cleanUpMap(self,mapWidth,mapHeight):
 		if (self.smoothEdges):
-			for i in xrange (3):
+			for i in range (3):
 				# Look at each cell individually and check for smoothness
-				for x in xrange(1,mapWidth-1):
-					for y in xrange (1,mapHeight-1):
+				for x in range(1,mapWidth-1):
+					for y in range (1,mapHeight-1):
 						if (self.level[x][y] == 1) and (self.getAdjacentWallsSimple(x,y) <= self.smoothing):
 							self.level[x][y] = 0
 
@@ -1831,8 +1831,8 @@ class Rect: # used for the tunneling algorithm
 		self.y2 = y+h
 
 	def center(self):
-		centerX = (self.x1 + self.x2)/2
-		centerY = (self.y1 + self.y2)/2
+		centerX = int((self.x1 + self.x2)/2)
+		centerY = int((self.y1 + self.y2)/2)
 		return (centerX, centerY)
 
 	def intersect(self, other):
